@@ -14,6 +14,10 @@ module.exports = {
         colors: {
             ...colors,
         },
+        plugins: [
+            // ...
+            require('@tailwindcss/forms'),
+        ],
         // extend: {
         //     backgroundImage: {
         //         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

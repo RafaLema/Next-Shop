@@ -1,43 +1,67 @@
+import PageHeading from '@/common/PageHeading';
+import { useEffect, useState } from 'react';
+import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import Modal from '@/common/Modal';
+import FormProduct from '@/components/FormProduct';
+import axios from 'axios';
+import Link from 'next/link';
 import endPoints from '@/services/api';
-import useFetch from '@/hooks/useFetch';
-import { Chart } from '@/common/Chart';
+import useAlert from '@/hooks/useAlert';
+import Alert from '@/common/Alert';
+import { deleteProduct } from '@/services/api/products';
 
-const PRODUCT_LIMIT = 16;
-const PRODUCT_OFFSET = 16;
+export default function Products() {
+    const [openModal, setOpenModal] = useState(false);
+    const [products, setProducts] = useState([]);
+    const { alert, setAlert, toggleAlert } = useAlert();
 
-export default function Dashboard() {
-    const products = useFetch(
-        endPoints.products.getProducts(PRODUCT_OFFSET, PRODUCT_LIMIT)
-    );
+    useEffect(() => {
+        async function getProducts() {
+            const response = await axios.get(endPoints.products.getAllProducts);
+            setProducts(response.data);
+        }
+        try {
+            getProducts();
+        } catch (error) {
+            //console.log(error);
+        }
+    }, [alert]);
 
-    const categoryNames = products?.map((p) => p.category.name) || [];
-
-    const countOccurrences = (arr) =>
-        arr.reduce(
-            (prev, curr) => ((prev[curr] = ++prev[curr] || 1), prev),
-            {}
-        );
-
-    const data = {
-        datasets: [
-            {
-                label: 'Category',
-                data: countOccurrences(categoryNames),
-                borderWidth: 2,
-                backgroundColor: [
-                    '#FF6384',
-                    '#A52A2A',
-                    '#FFCE56',
-                    '#7CAC4E',
-                    '#36A2EB',
-                ],
-            },
-        ],
+    const handleDelete = async (id) => {
+        try {
+            await deleteProduct(id);
+            setAlert({
+                active: true,
+                message: 'Product deleted successfully',
+                type: 'success',
+                autoClose: true,
+            });
+        } catch (error) {
+            setAlert({
+                active: true,
+                message: 'Error deleting product',
+                type: 'error',
+                autoClose: true,
+            });
+        }
     };
 
     return (
         <>
-            <Chart className="mb-8 mt-2" chartData={data} />
+            <Alert alert={alert} onClose={toggleAlert} />
+            <PageHeading
+                title="List of products"
+                actions={[
+                    {
+                        name: 'Add new product',
+                        icon: <PlusIcon />,
+                        bgColor: 'indigo-600',
+                        color: 'white',
+                        bgHoverColor: 'indigo-500',
+                        onClick: () => setOpenModal(true),
+                    },
+                ]}
+            />
             <div className="flex flex-col">
                 <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
@@ -123,20 +147,21 @@ export default function Dashboard() {
                                                 {product.id}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <a
-                                                    href="/."
+                                                <Link
+                                                    href={`/dashboard/edit/${product.id}`}
                                                     className="text-indigo-600 hover:text-indigo-900"
                                                 >
                                                     Edit
-                                                </a>
+                                                </Link>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <a
-                                                    href="/."
-                                                    className="text-red-600 hover:text-indigo-900"
-                                                >
-                                                    Delete
-                                                </a>
+                                                <TrashIcon
+                                                    className="flex-shrink-0 h-6 w-6 text-gray-400 cursor-pointer"
+                                                    aria-hidden="true"
+                                                    onClick={() =>
+                                                        handleDelete(product.id)
+                                                    }
+                                                />
                                             </td>
                                         </tr>
                                     ))}
@@ -146,6 +171,9 @@ export default function Dashboard() {
                     </div>
                 </div>
             </div>
+            <Modal open={openModal} setOpen={setOpenModal}>
+                <FormProduct setOpen={setOpenModal} setAlert={setAlert} />
+            </Modal>
         </>
     );
 }
