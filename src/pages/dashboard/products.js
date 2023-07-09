@@ -9,6 +9,7 @@ import endPoints from '@/services/api';
 import useAlert from '@/hooks/useAlert';
 import Alert from '@/common/Alert';
 import { deleteProduct } from '@/services/api/products';
+import Image from 'next/image';
 
 export default function Products() {
     const [openModal, setOpenModal] = useState(false);
@@ -117,7 +118,7 @@ export default function Products() {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
                                                     <div className="flex-shrink-0 h-10 w-10">
-                                                        <img
+                                                        <Image
                                                             className="h-10 w-10 rounded-full"
                                                             src={
                                                                 product

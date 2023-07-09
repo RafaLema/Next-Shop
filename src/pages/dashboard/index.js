@@ -1,6 +1,8 @@
 import endPoints from '@/services/api';
 import useFetch from '@/hooks/useFetch';
 import { Chart } from '@/common/Chart';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const PRODUCT_LIMIT = 16;
 const PRODUCT_OFFSET = 16;
@@ -93,7 +95,7 @@ export default function Dashboard() {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
                                                     <div className="flex-shrink-0 h-10 w-10">
-                                                        <img
+                                                        <Image
                                                             className="h-10 w-10 rounded-full"
                                                             src={
                                                                 product
@@ -123,20 +125,20 @@ export default function Dashboard() {
                                                 {product.id}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <a
+                                                <Link
                                                     href="/."
                                                     className="text-indigo-600 hover:text-indigo-900"
                                                 >
                                                     Edit
-                                                </a>
+                                                </Link>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <a
+                                                <Link
                                                     href="/."
                                                     className="text-red-600 hover:text-indigo-900"
                                                 >
                                                     Delete
-                                                </a>
+                                                </Link>
                                             </td>
                                         </tr>
                                     ))}
